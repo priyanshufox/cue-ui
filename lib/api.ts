@@ -40,6 +40,11 @@ export async function getLinkedInAuthUrl(): Promise<string> {
   return data.url;
 }
 
+export async function getTwitterAuthUrl(): Promise<string> {
+  const data = await apiFetch<{ url: string }>("/social/twitter/auth-url");
+  return data.url;
+}
+
 export async function getSocialAccounts(): Promise<SocialAccount[]> {
   return apiFetch<SocialAccount[]>("/social/accounts");
 }

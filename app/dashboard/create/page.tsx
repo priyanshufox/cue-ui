@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { createPost, uploadMedia } from "@/lib/api";
+import { createPost, uploadMedia, getSocialAccounts, type SocialAccount } from "@/lib/api";
+import { ToastStack, type ToastItem } from "@/app/components/Toast";
 
 type Mode = "now" | "schedule";
 
@@ -17,8 +18,24 @@ export default function CreatePostPage() {
   const [scheduledAt, setScheduledAt] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [uploadingMedia, setUploadingMedia] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
+
+  const addToast = useCallback((message: string, type: ToastItem["type"]) => {
+    setToasts((prev) => [...prev, { id: Date.now(), message, type }]);
+  }, []);
+
+  const removeToast = useCallback((id: number) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+  const [accounts, setAccounts] = useState<SocialAccount[]>([]);
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+
+  useEffect(() => {
+    getSocialAccounts().then((data) => {
+      setAccounts(data);
+      setSelectedPlatforms(data.map((a) => a.platform));
+    }).catch(() => {});
+  }, []);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -38,15 +55,18 @@ export default function CreatePostPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!content.trim()) {
-      setError("Post content is required.");
+      addToast("Post content is required.", "error");
+      return;
+    }
+    if (selectedPlatforms.length === 0) {
+      addToast("Select at least one platform.", "error");
       return;
     }
     if (mode === "schedule" && !scheduledAt) {
-      setError("Please pick a date/time to schedule.");
+      addToast("Please pick a date/time to schedule.", "error");
       return;
     }
 
-    setError("");
     setSubmitting(true);
 
     try {
@@ -67,53 +87,94 @@ export default function CreatePostPage() {
       const post = await createPost({
         content: content.trim(),
         media_urls: mediaUrls,
-        platforms: ["linkedin"],
+        platforms: selectedPlatforms,
         scheduled_at: scheduled,
       });
 
       if (mode === "now" && post.status === "draft") {
-        // Publish immediately
         const { publishPost } = await import("@/lib/api");
         await publishPost(post.id);
-        setSuccess("Post published to LinkedIn!");
+        const names = selectedPlatforms.map((p) => p === "twitter" ? "X / Twitter" : "LinkedIn").join(" & ");
+        addToast(`Post published to ${names}!`, "success");
       } else {
-        setSuccess(
+        addToast(
           mode === "schedule"
             ? `Post scheduled for ${new Date(scheduledAt).toLocaleString()}.`
-            : "Post saved as draft."
+            : "Post saved as draft.",
+          "success"
         );
       }
 
-      setTimeout(() => router.push("/dashboard"), 1800);
+      setTimeout(() => router.push("/dashboard"), 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      addToast(err instanceof Error ? err.message : "Something went wrong.", "error");
     } finally {
       setSubmitting(false);
     }
   }
 
   const charCount = content.length;
-  const CHAR_LIMIT = 3000;
+  const hasTwitter = selectedPlatforms.includes("twitter");
+  const CHAR_LIMIT = hasTwitter ? 280 : 3000;
   const charWarning = charCount > CHAR_LIMIT * 0.9;
+  const charOver = charCount > CHAR_LIMIT;
 
   return (
     <div className="max-w-2xl mx-auto px-5 py-8">
+      <ToastStack toasts={toasts} onClose={removeToast} />
       {/* Page header */}
       <div className="mb-6">
         <h1 className="text-lg font-semibold text-white">Create Post</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Compose and schedule or publish to LinkedIn</p>
+        <p className="text-sm text-gray-500 mt-0.5">Compose and schedule or publish to your connected channels</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Platform badge */}
-        <div className="flex items-center gap-2 px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl w-fit">
-          <div className="w-5 h-5 rounded bg-[#0077b5] flex items-center justify-center flex-shrink-0">
-            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-            </svg>
+        {/* Platform selector */}
+        {accounts.length === 0 ? (
+          <p className="text-xs text-gray-500">No channels connected. <a href="/dashboard" className="text-[#45b26b] hover:underline">Connect one</a> first.</p>
+        ) : (
+          <div className="flex items-center gap-2 flex-wrap">
+            {accounts.map((account) => {
+              const selected = selectedPlatforms.includes(account.platform);
+              const isLinkedIn = account.platform === "linkedin";
+              return (
+                <button
+                  key={account.id}
+                  type="button"
+                  onClick={() => setSelectedPlatforms((prev) =>
+                    prev.includes(account.platform)
+                      ? prev.filter((p) => p !== account.platform)
+                      : [...prev, account.platform]
+                  )}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-medium transition-colors ${
+                    selected
+                      ? "bg-[#1a1a1a] border-[#45b26b] text-white"
+                      : "bg-[#1a1a1a] border-[#2a2a2a] text-gray-500 hover:border-[#444]"
+                  }`}
+                >
+                  {selected && (
+                    <svg className="w-3 h-3 text-[#45b26b] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                  <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 ${isLinkedIn ? "bg-[#0077b5]" : "bg-black"}`}>
+                    {isLinkedIn ? (
+                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                      </svg>
+                    ) : (
+                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                      </svg>
+                    )}
+                  </div>
+                  {isLinkedIn ? "LinkedIn" : "X / Twitter"}
+                  <span className="text-[10px] text-gray-600 font-normal truncate max-w-[80px]">{account.screen_name}</span>
+                </button>
+              );
+            })}
           </div>
-          <span className="text-xs font-medium text-white">LinkedIn</span>
-        </div>
+        )}
 
         {/* Content editor */}
         <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl overflow-hidden">
@@ -170,7 +231,7 @@ export default function CreatePostPage() {
                 </svg>
               </button>
             </div>
-            <span className={`text-xs ${charWarning ? "text-yellow-500" : "text-gray-600"}`}>
+            <span className={`text-xs ${charOver ? "text-red-400" : charWarning ? "text-yellow-500" : "text-gray-600"}`}>
               {charCount}/{CHAR_LIMIT}
             </span>
           </div>
@@ -225,26 +286,12 @@ export default function CreatePostPage() {
           )}
         </div>
 
-        {/* Feedback */}
-        {error && (
-          <div className="px-4 py-3 bg-red-900/30 border border-red-700/50 rounded-xl text-sm text-red-400">
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="px-4 py-3 bg-green-900/30 border border-green-700/50 rounded-xl text-sm text-green-400 flex items-center gap-2">
-            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-            {success}
-          </div>
-        )}
 
         {/* Actions */}
         <div className="flex items-center gap-3">
           <button
             type="submit"
-            disabled={submitting || !content.trim()}
+            disabled={submitting || !content.trim() || charOver || selectedPlatforms.length === 0}
             className="flex items-center gap-2 px-5 py-2.5 bg-[#45b26b] hover:bg-[#3da05f] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl transition-colors"
           >
             {submitting ? (

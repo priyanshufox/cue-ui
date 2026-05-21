@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import { getUser, clearAuth, type AuthUser } from "@/lib/auth";
 import {
-  getSocialAccounts, getLinkedInAuthUrl, disconnectAccount, type SocialAccount,
+  getSocialAccounts, getLinkedInAuthUrl, getTwitterAuthUrl, disconnectAccount, type SocialAccount,
 } from "@/lib/api";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -15,6 +15,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [accounts, setAccounts] = useState<SocialAccount[]>([]);
   const [showChannelsBanner, setShowChannelsBanner] = useState(true);
   const [connectingLinkedIn, setConnectingLinkedIn] = useState(false);
+  const [connectingTwitter, setConnectingTwitter] = useState(false);
 
   const loadAccounts = useCallback(async () => {
     try {
@@ -44,6 +45,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }
 
+  async function handleTwitterConnect() {
+    setConnectingTwitter(true);
+    try {
+      const url = await getTwitterAuthUrl();
+      window.location.href = url;
+    } catch {
+      setConnectingTwitter(false);
+    }
+  }
+
   async function handleDisconnect(accountId: number) {
     try {
       await disconnectAccount(accountId);
@@ -63,6 +74,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     : user?.email?.[0]?.toUpperCase() ?? "M";
 
   const linkedInAccount = accounts.find((a) => a.platform === "linkedin");
+  const twitterAccount = accounts.find((a) => a.platform === "twitter");
   const connectedCount = accounts.length;
   const MAX_CHANNELS = 3;
 
@@ -189,14 +201,56 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </button>
             )}
 
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#252525] transition-colors text-left">
-              <div className="w-7 h-7 rounded-full bg-[#252525] border border-dashed border-[#444] flex items-center justify-center flex-shrink-0">
-                <svg className="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                </svg>
+            {/* Twitter/X */}
+            {twitterAccount ? (
+              <div className="flex items-center gap-3 px-3 py-2 rounded-lg group">
+                <div className="relative flex-shrink-0">
+                  <div className="w-7 h-7 rounded-lg bg-black flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                  </div>
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#45b26b] border-2 border-[#1a1a1a]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm text-white truncate">@{twitterAccount.screen_name}</div>
+                  <div className="text-[10px] text-[#45b26b]">Connected</div>
+                </div>
+                <button
+                  onClick={() => handleDisconnect(twitterAccount.id)}
+                  className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-400 transition-all"
+                  title="Disconnect"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
-              <span className="text-sm text-gray-500">More channels</span>
-            </button>
+            ) : (
+              <button
+                onClick={handleTwitterConnect}
+                disabled={connectingTwitter}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#252525] transition-colors text-left disabled:opacity-60"
+              >
+                <div className="relative flex-shrink-0">
+                  <div className="w-7 h-7 rounded-lg bg-black flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                  </div>
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#1a1a1a] border border-[#1a1a1a] flex items-center justify-center">
+                    <div className="w-3 h-3 rounded-full bg-[#2a2a2a] flex items-center justify-center">
+                      <svg className="w-2 h-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <span className="text-sm text-gray-400 hover:text-white">
+                  {connectingTwitter ? "Connecting…" : "X / Twitter"}
+                </span>
+              </button>
+            )}
           </div>
         </div>
 

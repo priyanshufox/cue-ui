@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getPosts, publishPost, type Post } from "@/lib/api";
+import { Toast } from "@/app/components/Toast";
 
 type Tab = "scheduled" | "drafts" | "sent" | "failed";
 
@@ -21,39 +22,6 @@ function formatDate(iso: string) {
     hour: "2-digit",
     minute: "2-digit",
   });
-}
-
-function Toast({ message, type, onClose }: { message: string; type: "success" | "error"; onClose: () => void }) {
-  useEffect(() => {
-    const t = setTimeout(onClose, 4000);
-    return () => clearTimeout(t);
-  }, [onClose]);
-
-  return (
-    <div
-      className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium ${
-        type === "success"
-          ? "bg-[#45b26b] text-white"
-          : "bg-red-500 text-white"
-      }`}
-    >
-      {type === "success" ? (
-        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-        </svg>
-      ) : (
-        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z" />
-        </svg>
-      )}
-      {message}
-      <button onClick={onClose} className="ml-1 opacity-70 hover:opacity-100">
-        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
-  );
 }
 
 function PostCard({ post, onPublish }: { post: Post; onPublish: (id: number) => void }) {
@@ -84,11 +52,21 @@ function PostCard({ post, onPublish }: { post: Post; onPublish: (id: number) => 
           {post.platforms.map((p) => (
             <span key={p} className="flex items-center gap-1 text-[11px] text-gray-500">
               {p === "linkedin" && (
-                <svg className="w-3 h-3 text-[#0077b5]" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                </svg>
+                <>
+                  <svg className="w-3 h-3 text-[#0077b5]" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                  LinkedIn
+                </>
               )}
-              LinkedIn
+              {p === "twitter" && (
+                <>
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                  X / Twitter
+                </>
+              )}
             </span>
           ))}
           {post.scheduled_at && (
@@ -125,6 +103,9 @@ const OAUTH_ERROR_MESSAGES: Record<string, string> = {
   linkedin_denied: "LinkedIn connection was cancelled.",
   linkedin_token_exchange: "Failed to get LinkedIn access token.",
   linkedin_profile_fetch: "Failed to fetch LinkedIn profile.",
+  twitter_denied: "X / Twitter connection was cancelled.",
+  twitter_token_exchange: "Failed to get X / Twitter access token.",
+  twitter_profile_fetch: "Failed to fetch X / Twitter profile.",
 };
 
 function DashboardContent() {
@@ -141,7 +122,8 @@ function DashboardContent() {
   const upgraded = searchParams.get("upgraded");
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(() => {
     if (connected === "linkedin") return { message: "LinkedIn connected successfully!", type: "success" };
-    if (oauthError) return { message: OAUTH_ERROR_MESSAGES[oauthError] ?? "LinkedIn connection failed.", type: "error" };
+    if (connected === "twitter") return { message: "X / Twitter connected successfully!", type: "success" };
+    if (oauthError) return { message: OAUTH_ERROR_MESSAGES[oauthError] ?? "Connection failed.", type: "error" };
     if (upgraded === "1") return { message: "You're now on Pro — enjoy unlimited posts and channels!", type: "success" };
     return null;
   });
@@ -187,7 +169,9 @@ function DashboardContent() {
   return (
     <div className="h-full flex flex-col">
       {toast && (
-        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+        <div className="fixed bottom-5 right-5 z-50 pointer-events-none">
+          <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+        </div>
       )}
 
       {/* Top header */}
