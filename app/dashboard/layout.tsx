@@ -11,7 +11,8 @@ import {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [user] = useState<AuthUser | null>(() => (typeof window !== "undefined" ? getUser() : null));
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [mounted, setMounted] = useState(false);
   const [accounts, setAccounts] = useState<SocialAccount[]>([]);
   const [showChannelsBanner, setShowChannelsBanner] = useState(true);
   const [connectingLinkedIn, setConnectingLinkedIn] = useState(false);
@@ -27,13 +28,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, []);
 
   useEffect(() => {
+    const u = getUser();
+    setUser(u);
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     if (!user) {
       router.replace("/login");
       return;
     }
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadAccounts();
-  }, [user, router, loadAccounts]);
+  }, [mounted, user, router, loadAccounts]);
 
   async function handleLinkedInConnect() {
     setConnectingLinkedIn(true);
@@ -76,7 +84,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const linkedInAccount = accounts.find((a) => a.platform === "linkedin");
   const twitterAccount = accounts.find((a) => a.platform === "twitter");
   const connectedCount = accounts.length;
-  const MAX_CHANNELS = 3;
+  const MAX_CHANNELS = 2;
 
   return (
     <div className="flex h-screen bg-[#111111] overflow-hidden">
@@ -90,7 +98,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <rect y="7" width="22" height="3" rx="1.5" fill="white"/>
               <rect y="14" width="16" height="3" rx="1.5" fill="white"/>
             </svg>
-            <span className="text-[15px] font-semibold text-white tracking-tight">Buffer</span>
+            <span className="text-[15px] font-semibold text-white tracking-tight">Cue</span>
           </Link>
           <button className="text-gray-500 hover:text-gray-300 transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -116,19 +124,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Main nav */}
         <nav className="px-2 space-y-0.5">
           <Link
-            href="/dashboard/create"
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
-              pathname === "/dashboard/create"
-                ? "bg-[#252525] text-white"
-                : "text-gray-400 hover:text-white hover:bg-[#252525]"
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-            </svg>
-            Create
-          </Link>
-          <Link
             href="/dashboard"
             className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
               pathname === "/dashboard"
@@ -142,6 +137,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </svg>
               Publish
             </div>
+          </Link>
+          <Link
+            href="/dashboard/agent-schedules"
+            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
+              pathname.startsWith("/dashboard/agent-schedules")
+                ? "bg-[#252525] text-white"
+                : "text-gray-400 hover:text-white hover:bg-[#252525]"
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
+            </svg>
+            AI Scheduler
+          </Link>
+          <Link
+            href="/dashboard/repurpose"
+            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
+              pathname.startsWith("/dashboard/repurpose")
+                ? "bg-[#252525] text-white"
+                : "text-gray-400 hover:text-white hover:bg-[#252525]"
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" />
+            </svg>
+            Repurpose
           </Link>
         </nav>
 

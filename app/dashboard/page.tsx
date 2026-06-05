@@ -112,7 +112,7 @@ function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<Tab>("scheduled");
-  const [view, setView] = useState<"list" | "calendar">("list");
+  const [view, setView] = useState<"list" | "grid">("list");
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -187,7 +187,7 @@ function DashboardContent() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* List / Calendar toggle */}
+          {/* List / Grid toggle */}
           <div className="flex items-center bg-[#222] border border-[#333] rounded-lg overflow-hidden">
             <button
               onClick={() => setView("list")}
@@ -201,15 +201,15 @@ function DashboardContent() {
               List
             </button>
             <button
-              onClick={() => setView("calendar")}
+              onClick={() => setView("grid")}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
-                view === "calendar" ? "bg-[#2e2e2e] text-white" : "text-gray-500 hover:text-gray-300"
+                view === "grid" ? "bg-[#2e2e2e] text-white" : "text-gray-500 hover:text-gray-300"
               }`}
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
               </svg>
-              Calendar
+              Grid
             </button>
           </div>
 
@@ -255,6 +255,12 @@ function DashboardContent() {
           </div>
         ) : filtered.length === 0 ? (
           <EmptyState tab={activeTab} />
+        ) : view === "grid" ? (
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            {filtered.map((post) => (
+              <PostCard key={post.id} post={post} onPublish={handlePublish} />
+            ))}
+          </div>
         ) : (
           <div className="space-y-3 max-w-2xl">
             {filtered.map((post) => (

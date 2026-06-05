@@ -37,10 +37,10 @@ export default function LoginPage() {
               <rect width="32" height="32" rx="8" fill="#2563EB" />
               <path d="M8 10h16M8 16h16M8 22h10" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-lg font-bold text-gray-900">Buffer</span>
+            <span className="text-lg font-bold text-gray-900">Cue</span>
           </Link>
           <p className="text-sm text-gray-500">
-            New to Buffer?{" "}
+            New to Cue?{" "}
             <Link href="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
               Create an account
             </Link>
@@ -53,7 +53,7 @@ export default function LoginPage() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
             <div className="text-center mb-8">
               <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back</h1>
-              <p className="text-gray-500 text-sm">Sign in to your Buffer account</p>
+              <p className="text-gray-500 text-sm">Sign in to your Cue account</p>
             </div>
 
             {/* Social login */}
@@ -134,7 +134,7 @@ export default function LoginPage() {
           </div>
 
           <p className="text-center text-xs text-gray-400 mt-6 leading-relaxed">
-            By continuing, you agree to Buffer&apos;s{" "}
+            By continuing, you agree to Cue&apos;s{" "}
             <Link href="#" className="text-gray-500 hover:text-gray-700 underline">Terms of Service</Link>
             {" "}and{" "}
             <Link href="#" className="text-gray-500 hover:text-gray-700 underline">Privacy Policy</Link>.

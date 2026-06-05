@@ -251,14 +251,6 @@ export default function NewPostPage() {
                       </svg>
                     )}
                   </button>
-                  {[
-                    { title: "Add emoji", icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> },
-                    { title: "Add link", icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg> },
-                  ].map((tool) => (
-                    <button key={tool.title} title={tool.title} className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                      {tool.icon}
-                    </button>
-                  ))}
                 </div>
                 <div className={`text-xs font-medium ${isOverLimit ? "text-red-500" : charCount > charLimit * 0.8 ? "text-amber-500" : "text-gray-400"}`}>
                   {charCount}/{charLimit}

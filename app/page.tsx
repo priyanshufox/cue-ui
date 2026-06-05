@@ -17,7 +17,7 @@ const features = [
       </svg>
     ),
     title: "Schedule posts in advance",
-    description: "Plan and schedule your social media content weeks ahead. Set it and forget it — Buffer publishes automatically at the perfect time.",
+    description: "Plan and schedule your social media content weeks ahead. Set it and forget it — Cue publishes automatically at the perfect time.",
   },
   {
     icon: (
@@ -50,14 +50,14 @@ const features = [
 
 const testimonials = [
   {
-    quote: "Buffer has completely transformed how I manage social media for my clients. The scheduling interface is incredibly intuitive.",
+    quote: "Cue has completely transformed how I manage social media for my clients. The scheduling interface is incredibly intuitive.",
     author: "Sarah Chen",
     role: "Social Media Manager",
     company: "Freelance",
     avatar: "SC",
   },
   {
-    quote: "We grew our Twitter following by 340% in 6 months just by being consistent with Buffer's scheduling tools.",
+    quote: "We grew our Twitter following by 340% in 6 months just by being consistent with Cue's scheduling tools.",
     author: "Marcus Johnson",
     role: "Founder",
     company: "TechStartup Inc.",
@@ -139,7 +139,7 @@ export default function Home() {
             <span className="text-blue-600">social media</span>
           </h1>
           <p className="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto mb-10">
-            Buffer helps you build an audience organically. Schedule posts across every
+            Cue helps you build an audience organically. Schedule posts across every
             platform, analyze performance, and engage with your followers — all in one place.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -170,7 +170,7 @@ export default function Home() {
               <div className="w-3 h-3 rounded-full bg-red-500"></div>
               <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <div className="mx-auto text-xs text-gray-500">buffer.app/dashboard</div>
+              <div className="mx-auto text-xs text-gray-500">cue.app/dashboard</div>
             </div>
             {/* Mock dashboard content */}
             <div className="flex h-80">
@@ -237,7 +237,7 @@ export default function Home() {
               Everything you need to grow
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Buffer is the all-in-one social media toolkit for small businesses, creators, and agencies.
+              Cue is the all-in-one social media toolkit for small businesses, creators, and agencies.
             </p>
           </div>
           <div className="grid md:grid-cols-2 gap-8">
@@ -280,7 +280,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Loved by creators worldwide</h2>
-            <p className="text-lg text-gray-600">See what our customers have to say about Buffer.</p>
+            <p className="text-lg text-gray-600">See what our customers have to say about Cue.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((t) => (
@@ -378,7 +378,7 @@ export default function Home() {
             Ready to grow your audience?
           </h2>
           <p className="text-lg text-gray-600 mb-8">
-            Join 75,000+ businesses using Buffer to build their social media presence.
+            Join 75,000+ businesses using Cue to build their social media presence.
             Start free, no credit card required.
           </p>
           <Link

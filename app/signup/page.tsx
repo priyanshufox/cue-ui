@@ -51,7 +51,7 @@ export default function SignupPage() {
               <rect width="32" height="32" rx="8" fill="#2563EB" />
               <path d="M8 10h16M8 16h16M8 22h10" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-lg font-bold text-gray-900">Buffer</span>
+            <span className="text-lg font-bold text-gray-900">Cue</span>
           </Link>
           <p className="text-sm text-gray-500">
             Already have an account?{" "}
@@ -70,7 +70,7 @@ export default function SignupPage() {
               Start scheduling your social media posts today
             </h2>
             <p className="text-gray-500 mb-8">
-              Join 75,000+ businesses and creators already using Buffer to grow their audience.
+              Join 75,000+ businesses and creators already using Cue to grow their audience.
             </p>
             <ul className="space-y-4">
               {benefits.map((b) => (
@@ -93,7 +93,7 @@ export default function SignupPage() {
                 </div>
               </div>
               <p className="text-xs text-gray-600 italic leading-relaxed">
-                &ldquo;Buffer has completely transformed how I manage social media. The scheduling interface is incredibly intuitive.&rdquo;
+                &ldquo;Cue has completely transformed how I manage social media. The scheduling interface is incredibly intuitive.&rdquo;
               </p>
             </div>
           </div>
@@ -210,7 +210,7 @@ export default function SignupPage() {
             </form>
 
             <p className="text-center text-xs text-gray-400 mt-5 leading-relaxed">
-              By signing up, you agree to Buffer&apos;s{" "}
+              By signing up, you agree to Cue&apos;s{" "}
               <Link href="#" className="text-gray-500 hover:text-gray-700 underline">Terms of Service</Link>
               {" "}and{" "}
               <Link href="#" className="text-gray-500 hover:text-gray-700 underline">Privacy Policy</Link>.

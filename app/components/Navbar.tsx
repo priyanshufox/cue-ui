@@ -11,7 +11,7 @@ export default function Navbar() {
                 <rect width="32" height="32" rx="8" fill="#2563EB" />
                 <path d="M8 10h16M8 16h16M8 22h10" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
               </svg>
-              <span className="text-xl font-bold text-gray-900">Buffer</span>
+              <span className="text-xl font-bold text-gray-900">Cue</span>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">

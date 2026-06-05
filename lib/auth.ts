@@ -1,5 +1,5 @@
-const TOKEN_KEY = "buffer_token";
-const USER_KEY = "buffer_user";
+const TOKEN_KEY = "cue_token";
+const USER_KEY = "cue_user";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 

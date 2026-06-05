@@ -18,7 +18,7 @@ export default function Footer() {
                 <rect width="32" height="32" rx="8" fill="#2563EB" />
                 <path d="M8 10h16M8 16h16M8 22h10" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
               </svg>
-              <span className="text-lg font-bold text-white">Buffer</span>
+              <span className="text-lg font-bold text-white">Cue</span>
             </Link>
             <p className="text-sm leading-relaxed">
               Build your audience on social media, one post at a time.
@@ -40,7 +40,7 @@ export default function Footer() {
           ))}
         </div>
         <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm">© 2025 Buffer. All rights reserved.</p>
+          <p className="text-sm">© 2025 Cue. All rights reserved.</p>
           <div className="flex items-center gap-4">
             {["Twitter", "LinkedIn", "Instagram"].map((platform) => (
               <Link key={platform} href="#" className="text-sm hover:text-white transition-colors">

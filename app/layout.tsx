@@ -8,9 +8,9 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Buffer – Social Media Management",
+  title: "Cue – Social Media Management",
   description:
-    "Buffer helps you build an audience organically. Schedule posts, analyze performance, and manage all your social media accounts in one place.",
+    "Cue helps you build an audience organically. Schedule posts, analyze performance, and manage all your social media accounts in one place.",
 };
 
 export default function RootLayout({

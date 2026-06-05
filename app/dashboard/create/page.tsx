@@ -75,8 +75,8 @@ export default function CreatePostPage() {
       if (mediaFile) {
         setUploadingMedia(true);
         try {
-          const { url } = await uploadMedia(mediaFile);
-          mediaUrls = [url];
+          const { key } = await uploadMedia(mediaFile);
+          mediaUrls = [key];
         } finally {
           setUploadingMedia(false);
         }
